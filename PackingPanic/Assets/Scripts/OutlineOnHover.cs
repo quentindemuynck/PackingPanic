@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,8 +6,11 @@ public class OutlineOnHover : MonoBehaviour
     [SerializeField]
     private Material hoverMaterial;
 
-    private Renderer currentRenderer;   
-    private Renderer previousRenderer;  
+    private Renderer currentRenderer;
+    private Renderer previousRenderer;
+
+    private InteractableObject currentInteractable;
+    private InteractableObject previousInteractable;
 
     void Start()
     {
@@ -32,13 +34,19 @@ public class OutlineOnHover : MonoBehaviour
             if (hit.collider.CompareTag("Interactable"))
             {
                 currentRenderer = hit.collider.GetComponent<Renderer>();
+                currentInteractable = hit.collider.GetComponent<InteractableObject>();
 
-                ResetMaterial();    
 
+                ResetMaterial();
                 ApplyHoverMaterial(currentRenderer);
+                if (currentInteractable != null)
+                {
+                    currentInteractable.isHovered = true;  // Set the isHovered property
+                }
+
 
                 previousRenderer = currentRenderer;
-         
+                previousInteractable = currentInteractable;
             }
             else
             {
@@ -68,6 +76,11 @@ public class OutlineOnHover : MonoBehaviour
 
             previousRenderer.materials = newMaterials.ToArray();
         }
+
+        if (previousInteractable != null)
+        {
+            previousInteractable.isHovered = false;  // Reset isHovered when not hovering anymore
+        }
     }
 
     private void ApplyHoverMaterial(Renderer renderer)
@@ -89,7 +102,7 @@ public class OutlineOnHover : MonoBehaviour
     {
         foreach (Material mat in renderer.materials)
         {
-            if (AreMaterialsEqual(mat, hoverMaterial))  
+            if (AreMaterialsEqual(mat, hoverMaterial))
             {
                 return true;
             }
