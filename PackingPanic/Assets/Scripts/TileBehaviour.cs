@@ -1,11 +1,20 @@
+using PackingPanick.TileData;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public struct TileData
+{
+    public TileShape shape;
+    public Color color;
+}
 public class TileBehaviour : InteractableObject
 {
+    // List of all tiles at the moment
+    public static List<TileBehaviour> AllTiles = new List<TileBehaviour>();
+
     [SerializeField]
     private Rigidbody rb;
 
@@ -21,12 +30,18 @@ public class TileBehaviour : InteractableObject
     private bool _isHolding = false;
     private bool _isStored = false;
 
+    // Tiledata
+    private const int amountOfShapes = 7;
+    TileData _tileData;
+
     private void Awake()
     {
         if (_inputAsset == null) return;
 
         _interactAction = _inputAsset.FindActionMap("Gameplay").FindAction("Interact");
         _dropAction = _inputAsset.FindActionMap("Gameplay").FindAction("Drop");
+
+        InitializeTileData();
     }
 
     private void OnEnable()
@@ -34,7 +49,10 @@ public class TileBehaviour : InteractableObject
         if (_inputAsset == null) return;
 
         _inputAsset.Enable();
-        _interactAction.performed += OnInteract; 
+        _interactAction.performed += OnInteract;
+
+        // adding to list
+        AllTiles.Add(this);
     }
 
     private void OnDisable()
@@ -43,6 +61,9 @@ public class TileBehaviour : InteractableObject
 
         _interactAction.performed -= OnInteract; 
         _inputAsset.Disable();
+
+        // removing from list
+        AllTiles.Remove(this);
     }
 
     private void OnInteract(InputAction.CallbackContext context)
@@ -95,5 +116,31 @@ public class TileBehaviour : InteractableObject
             _isHolding = false;
         }
     }
+
+    private void InitializeTileData()
+    {
+        _tileData.shape = TileShapeLibrary.GetShape(Random.Range(0, amountOfShapes - 1));
+        Debug.Log(_tileData.shape.name);
+
+        _tileData.color = new Color(Random.value, Random.value, Random.value); 
+                                                                               
+        Renderer renderer = GetComponent<Renderer>(); 
+        if (renderer != null)
+        {
+            renderer.material.color = _tileData.color;
+        }
+    }
+
+    public TileData GetTileData()
+    {
+        return _tileData;
+    }
+
+    public bool GetIsHolding()
+    {
+        return _isHolding;
+    }
+
+
 
 }

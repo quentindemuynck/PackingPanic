@@ -16,7 +16,8 @@ public class PlayerCharacter : BasicCharacter
 
     // Speed variable to control the movement speed of the player
 
-    protected override void Awake()
+    p
+        ected override void Awake()
     {
         base.Awake();
 
