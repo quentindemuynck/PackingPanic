@@ -4,9 +4,15 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using PackingPanick.TileData;
+using UnityEditor;
 
 public class ChestBehaviour : InteractableObject
 {
+    [SerializeField] 
+    private GameObject _menu;
+
+    private PauseScreen _screen;
+
     [SerializeField]
     private GameObject tilePreviewImage;
 
@@ -21,7 +27,9 @@ public class ChestBehaviour : InteractableObject
     private InputActionAsset _inputAsset;
 
     private InputAction _interactAction;
-    private InputAction _rotateAction; // New input action for rotation
+    private InputAction _rotateAction;
+    private InputAction _closeAction;
+
     private bool isInventoryOpen = false;
 
     private GameObject[] gridSlots;
@@ -29,17 +37,32 @@ public class ChestBehaviour : InteractableObject
 
     private Dictionary<GameObject, Color> originalSlotColors = new Dictionary<GameObject, Color>();
 
-    private float rotationAngle = 0f; // To keep track of the rotation
+    private int middleSlotIndex = -2;
+
+    private const int gridWidth = 8;
+    private const int gridHeight = 8;
+
 
     private void Awake()
     {
-        if (_inputAsset == null) return;
-        _interactAction = _inputAsset.FindActionMap("Gameplay").FindAction("Interact");
-        _interactAction.performed += OnInteract;
+        if (_menu != null)
+        _screen = _menu.GetComponent<PauseScreen>();
 
-        // Initialize the rotation action
-        _rotateAction = _inputAsset.FindActionMap("Gameplay").FindAction("Rotate");
-        _rotateAction.performed += OnRotate; // Attach the rotation method
+        if (_screen != null)
+            _screen.OnMenuOpenedEvent += CloseChest;
+
+        if (_inputAsset == null) return;
+
+
+        _interactAction = _inputAsset.FindActionMap("Chest").FindAction("Interact");
+        _closeAction = _inputAsset.FindActionMap("Chest").FindAction("Close");
+
+        _interactAction.performed += OnInteract;
+        _closeAction.performed += OnClose;
+
+
+        _rotateAction = _inputAsset.FindActionMap("Chest").FindAction("Rotate");
+        _rotateAction.canceled += OnRotateReleased;
     }
 
     void Start()
@@ -60,8 +83,10 @@ public class ChestBehaviour : InteractableObject
             {
                 originalSlotColors[gridSlots[index]] = slotImage.color;
             }
-
+            GridSlot gridSlot = gridSlots[index].GetComponent<GridSlot>();
+            gridSlot.SetSlotIndex(index);
             AddEventTriggers(gridSlots[index]);
+            Debug.Log("added slot");
         }
     }
 
@@ -89,7 +114,7 @@ public class ChestBehaviour : InteractableObject
     private void OnDestroy()
     {
         _interactAction.performed -= OnInteract;
-        _rotateAction.performed -= OnRotate; // Detach the rotation method
+        _closeAction.performed -= OnClose;   // Detach the close method
     }
 
     private void Update()
@@ -98,46 +123,78 @@ public class ChestBehaviour : InteractableObject
         {
             DisplayHoldingTile();
         }
+
+        if (isInventoryOpen)
+        {
+            _inputAsset.FindActionMap("Gameplay", true).Disable();
+        }
     }
+
 
     private void OnInteract(InputAction.CallbackContext context)
     {
-        if ((_player.transform.position - this.transform.position).magnitude < 2)
+        if (!GetIsOpened() && (this.transform.position - _player.transform.position).magnitude < 3 && isHovered)
         {
-            if (context.control.device is Keyboard && context.control.name == "e")
+            OpenChest();
+        }
+        else if (GetIsOpened())
+        {
+            if (middleSlotIndex == -2)
             {
-                if (isInventoryOpen)
+                CloseChest();
+            }
+
+            TileBehaviour displayHoldingTile = GetHoldingTile();
+            if (displayHoldingTile == null && middleSlotIndex != -2)
+            {
+                GridSlot gridSlot = gridSlots[middleSlotIndex].GetComponent<GridSlot>();
+                if (gridSlot != null)
                 {
-                    CloseChest();
-                }
-                else if (isHovered)
-                {
-                    OpenChest();
+                    if( gridSlot.GetHoldingTile() != null)
+                    {
+                        PickStoredTile(gridSlot);
+                    }
                 }
             }
-            else if (context.control.device is Mouse)
+            else
             {
-                if (!isInventoryOpen && isHovered)
+                if (CheckValidStoring(displayHoldingTile, middleSlotIndex))
                 {
-                    OpenChest();
+                    StoreTile(displayHoldingTile, middleSlotIndex);
+                    displayHoldingTile.Store(true);
                 }
             }
         }
     }
 
-    private void OnRotate(InputAction.CallbackContext context)
+    private void OnClose(InputAction.CallbackContext context)
     {
-        // Increment rotation angle by 90 degrees on each rotation
-        rotationAngle += 90f; // or -90f for counter-clockwise
-        rotationAngle %= 360f; // Keep the angle within 0-359 degrees
+        if (GetIsOpened())
+        {
+            CloseChest();
+        }
     }
 
-    private void OpenChest()
+    private void OnRotateReleased(InputAction.CallbackContext context)
     {
+        if (GetIsOpened() && GetHoldingTile() != null)
+        {
+            Rotate();
+
+        }
+    }
+
+
+    void OpenChest()
+    {
+        middleSlotIndex = -2;
         if (!isInventoryOpen)
         {
             inventoryPanel?.SetActive(true);
             isInventoryOpen = true;
+
+            // Disables movement while in a chest
+            _inputAsset.FindActionMap("Gameplay", true).Disable();
         }
     }
 
@@ -153,24 +210,79 @@ public class ChestBehaviour : InteractableObject
             {
                 ResetSlotImage(gridSlots[index]);
             }
+
+            tilePreviewImage?.SetActive(false);
+
+            // Re-enable gameplay actions
+            _inputAsset.FindActionMap("Gameplay", true).Enable();
         }
     }
 
     // Hover effect: Add a semi-transparent overlay to the slot's color
     public void OnMouseOverSlot(GameObject slot)
     {
+        Debug.Log("Mouse over slot");
+
+        GridSlot gridSlot = slot.GetComponent<GridSlot>();
+
         Image slotImage = slot.GetComponent<Image>();
         if (slotImage != null)
         {
             Color overlayColor = new Color(0f, 0.5f, 0f, 0.3f);
             slotImage.color = originalSlotColors[slot] + overlayColor;
+
+            if (gridSlot != null)
+            {
+                HighlightTilesInMiddleSlot(gridSlot.GetIndex());
+
+                middleSlotIndex = gridSlot.GetIndex();
+            }
         }
     }
 
     public void OnMouseExitSlot(GameObject slot)
     {
-        ResetSlotImage(slot);
+        GridSlot hoveredSlot = slot.GetComponent<GridSlot>();
+        if (hoveredSlot != null)
+        {
+
+             HighlightTilesInMiddleSlot(hoveredSlot.GetIndex(), false); 
+             ResetSlotImage(slot);
+            middleSlotIndex = -2;
+        }
     }
+
+
+    private void HighlightTilesInMiddleSlot(int slotIndex, bool highlight = true)
+    {
+        GridSlot hoveredSlot = gridSlots[slotIndex].GetComponent<GridSlot>();
+        if (highlight)
+        {
+            hoveredSlot.HighlightSlot(true);
+        }
+        else
+        {
+            hoveredSlot.HighlightSlot(false);
+        }
+
+        
+        for (int index = 0; index < gridSlots.Length; index++)
+        {
+            GridSlot gridSlot = gridSlots[index].GetComponent<GridSlot>();
+            if (gridSlot != null && gridSlot.GetMiddleSlot() == hoveredSlot.GetMiddleSlot() && hoveredSlot.GetMiddleSlot() != -1)
+            {
+                if (highlight)
+                {
+                    gridSlot.HighlightSlot(true);
+                }
+                else
+                {
+                    gridSlot.HighlightSlot(false);
+                }
+            }
+        }
+    }
+
 
     private void ResetSlotImage(GameObject slot)
     {
@@ -224,14 +336,10 @@ public class ChestBehaviour : InteractableObject
         Image previewImage = tilePreviewImage.GetComponent<Image>();
         if (previewImage != null)
         {
-            previewImage.color = tileData.color;
             TileShape shape = TileShapeLibrary.GetShape(tileData.shape.name);
             previewImage.sprite = TileSpriteGenerator.CreateTileSprite(shape, tileData.color);
             previewImage.rectTransform.localScale = new Vector3(3, 3, 1);
         }
-
-        // Rotate the preview image based on the rotation angle
-        previewImage.transform.rotation = Quaternion.Euler(0, 0, rotationAngle);
     }
 
     private void PositionTilePreview(Vector2 mousePosition)
@@ -248,4 +356,150 @@ public class ChestBehaviour : InteractableObject
     {
         return TileSpriteGenerator.CreateTileSprite(shape, color);
     }
+
+    private void Rotate()
+    {
+        TileBehaviour currentTile = GetHoldingTile();
+
+        // Rotates the tile in te data
+        Debug.Log("Occupied Cells after Rotation:");
+        foreach (var cell in currentTile.GetTileData().shape.occupiedCells)
+        {
+            Debug.Log($"Cell Position: ({cell.x}, {cell.y})");
+        }
+
+        if (currentTile != null)
+        {
+            currentTile.GetTileData().shape.Rotate();
+            UpdateTilePreviewImage(currentTile.GetTileData());
+
+        }
+    }
+
+    private void StoreTile(TileBehaviour tile, int middleSlotIndex)
+    {
+        var occupiedCells = tile.GetTileData().shape.occupiedCells;
+
+        int middleX = middleSlotIndex % gridWidth;
+        int middleY = middleSlotIndex / gridWidth;
+
+        foreach (var cell in occupiedCells)
+        {
+            int gridX = middleX + cell.x - 1;
+            int gridY = middleY + cell.y - 1;
+
+            if (IsWithinGridBounds(gridX, gridY))
+            {
+                int slotIndex = gridX + gridY * gridWidth;
+                GridSlot gridSlot = gridSlots[slotIndex].GetComponent<GridSlot>();
+
+                // Only store tile if the slot is empty
+                if (gridSlot != null && gridSlot.GetHoldingTile() == null)
+                {
+                    gridSlot.SetHoldingTile(tile, middleSlotIndex);
+
+                    GameObject tileRepresentation = new GameObject("TileRepresentation");
+                    tileRepresentation.transform.SetParent(gridSlots[slotIndex].transform, false);
+                    tileRepresentation.transform.localPosition = Vector3.zero; // Center it in the slot
+
+
+                    Image tileImage = tileRepresentation.AddComponent<Image>();
+                    tileImage.color = tile.GetTileData().color;
+
+
+                    RectTransform rectTransform = tileImage.GetComponent<RectTransform>();
+                    rectTransform.sizeDelta = new Vector2(102, 102);
+
+                    // Add a BoxCollider2D for raycasting
+                    BoxCollider2D boxCollider = tileRepresentation.AddComponent<BoxCollider2D>();
+                    boxCollider.size = rectTransform.sizeDelta;
+
+                    Debug.Log($"Tile stored at slot ({gridX}, {gridY}) with index {slotIndex}");
+                }
+                else
+                {
+                    Debug.LogWarning($"Slot at index {slotIndex} is already occupied or null.");
+                }
+            }
+            else
+            {
+                CloseChest();
+                Debug.LogWarning($"Position ({gridX}, {gridY}) is out of bounds.");
+            }
+        }
+    }
+
+
+
+    private void PickStoredTile(GridSlot slot)
+    {
+        TileBehaviour tile = slot.GetHoldingTile();
+
+        tile.Store(false);
+
+        List<GridSlot> slotsToReset = new List<GridSlot>();
+
+        for (int index = 0; index < gridSlots.Length; index++)
+        {
+            GridSlot gridSlot = gridSlots[index].GetComponent<GridSlot>();
+            if (gridSlot != null && gridSlot.GetMiddleSlot() == slot.GetMiddleSlot() && gridSlot.GetMiddleSlot() != -1)
+            {
+                slotsToReset.Add(gridSlot);
+            }
+        }
+
+        // Reset later because the reset changes the middle slot aswell
+        foreach (var gridSlot in slotsToReset)
+        {
+            gridSlot.ResetHoldingTile(); 
+        }
+    }
+
+    private bool CheckValidStoring(TileBehaviour tile, int middleSlotIndex)
+    {
+        if (middleSlotIndex == -2)
+        {
+            CloseChest();
+            return false;
+        }
+        var occupiedCells = tile.GetTileData().shape.occupiedCells;
+
+        int middleX = middleSlotIndex % gridWidth;
+        int middleY = middleSlotIndex / gridWidth;
+
+        foreach (var cell in occupiedCells)
+        {
+            int gridX = middleX + cell.x - 1;
+            int gridY = middleY + cell.y - 1;
+
+
+            if (!IsWithinGridBounds(gridX, gridY))
+            {
+                CloseChest();
+                Debug.Log($"Tile is out of bounds at ({gridX}, {gridY}).");
+                return false;
+            }
+
+
+            int slotIndex = gridX + gridY * gridWidth;
+
+
+            GridSlot gridSlot = gridSlots[slotIndex].GetComponent<GridSlot>();
+            if (gridSlot != null && gridSlot.GetHoldingTile() != null)
+            {
+                Debug.Log($"Slot at ({gridX}, {gridY}) is already occupied.");
+                return false;
+            }
+        }
+        Debug.Log("Valid stroing location");
+        return true;
+    }
+
+
+    private bool IsWithinGridBounds(int x, int y)
+    {
+        return x >= 0 && x < gridWidth && y >= 0 && y < gridHeight;
+    }
+
 }
+

@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5336991709355034490
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1753632066571285044}
+  - component: {fileID: 434293287433636060}
+  m_Layer: 0
+  m_Name: Level
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1753632066571285044
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5336991709355034490}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -12.137599, y: 2.1887922, z: 8.747494}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &434293287433636060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5336991709355034490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db2dac1e665f01a4e92f042fb851038c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _waves: 1
+  _amountOfTiles: 10
+  _amountOfRequests: 5
+  _totalTime: 0
+  _clientPatience: 30
+  _tileDespawnTime: 30
+  _player: {fileID: 0}
+  _actionAsset: {fileID: 0}
+  _destinations: {fileID: 0}
+  _clientSpawnBounds: {fileID: 0}
+  _tileSpawnBounds: []
+  _tilePrefab: {fileID: 0}
+  _clientPrefab: {fileID: 0}
+  _starOneRequirementPrecentage: 30
+  _starTwoRequirementPrecentage: 52
+  _starThreeRequirementPrecentage: 88
+  _despawnParticle: {fileID: 1049499840250669964, guid: f834f46c6c0c33f4d8007bffdc040516,
+    type: 3}
+  _correctTileParticle: {fileID: 6936484588673515921, guid: 713b83d4ba203834689636372ee5e6e9,
+    type: 3}
+  _wrongTileParticle: {fileID: 7258399518139647794, guid: 144cc7e0a90608144a35466b7cb70624,
+    type: 3}
+  _timeSlowParticle: {fileID: 2822534186428657561, guid: e2421b3d8fea99b44bc92273c2be0b70,
+    type: 3}
+  _speedBoostParticle: {fileID: 2768940537717351348, guid: 74f5be2d6f31bc843ae12c8b884af1d4,
+    type: 3}
+  _boostDisplays: {fileID: 0}

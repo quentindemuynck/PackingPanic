@@ -10,9 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1787090659174742938}
   - component: {fileID: 7586327566012060460}
+  - component: {fileID: 5633933990899562348}
+  - component: {fileID: 6419703151048476941}
+  - component: {fileID: 694768269610990592}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -56,6 +59,63 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5633933990899562348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3361618533229395410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf7cf70555052ba4dbced81a503d656a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _inputAsset: {fileID: -944628639613478452, guid: c1f02a17e59c55646990fbff0fd6824e,
+    type: 3}
+--- !u!114 &6419703151048476941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3361618533229395410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faa034ffe8e0aa740ab5e1263d325bba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _acceleration: 40
+  _rotationSpeed: 8
+  _maxSpeed: 8
+  _decelerationRate: 4
+--- !u!54 &694768269610990592
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3361618533229395410}
+  serializedVersion: 4
+  m_Mass: 120
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 116
+  m_CollisionDetection: 0
 --- !u!1 &4905179514377418517
 GameObject:
   m_ObjectHideFlags: 0

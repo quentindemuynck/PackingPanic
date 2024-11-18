@@ -16,15 +16,34 @@ namespace PackingPanick.TileData
             this.occupiedCells = cells;
         }
 
+        public TileShape GetRotated()
+        {
+            List<Vector2Int> rotatedCells = new List<Vector2Int>(occupiedCells.Count);
+            for (int i = 0; i < occupiedCells.Count; i++)
+            {
+                int x = occupiedCells[i].x;
+                int y = occupiedCells[i].y;
+                rotatedCells.Add(new Vector2Int(y, -x));
+            }
+
+            return new TileShape(this.id, this.name, rotatedCells);
+        }
+
         public void Rotate()
         {
             for (int i = 0; i < occupiedCells.Count; i++)
             {
                 int x = occupiedCells[i].x;
                 int y = occupiedCells[i].y;
-                occupiedCells[i] = new Vector2Int(y, -x);
+
+                
+                int rotatedX = 1 + (y - 1);  
+                int rotatedY = 1 - (x - 1);  
+
+                occupiedCells[i] = new Vector2Int(rotatedX, rotatedY);
             }
         }
+
     }
 
     public static class TileShapeLibrary
@@ -43,10 +62,10 @@ namespace PackingPanick.TileData
             },
             { "L", new TileShape(1, "L", new List<Vector2Int>
                 {
-                    new Vector2Int(0, 0),
-                    new Vector2Int(0, 1),
-                    new Vector2Int(0, 2),
-                    new Vector2Int(1, 2)
+                    new Vector2Int(1, 0),
+                    new Vector2Int(1, 1),
+                    new Vector2Int(1, 2),
+                    new Vector2Int(2, 2)
                 })
             },
             { "J", new TileShape(2, "J", new List<Vector2Int>
@@ -126,6 +145,17 @@ namespace PackingPanick.TileData
                 Debug.LogError($"Shape with ID '{id}' not found in library.");
                 return default;
             }
+        }
+    }
+
+    public struct TileData
+    {
+        public TileShape shape;
+        public Color color;
+
+        public void SetShape(TileShape newShape)
+        {
+            shape = newShape;
         }
     }
 }

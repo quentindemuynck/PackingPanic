@@ -11,28 +11,32 @@ public class MovementBehaviour : MonoBehaviour
     private float _rotationSpeed = 2.0f;
 
     [SerializeField]
-    private float _maxSpeed = 5.0f; 
+    private float _maxSpeed = 5.0f;
+
+    private float _initialMaxSpeed;
 
     [SerializeField]
-    private float _decelerationRate = 1.0f; 
+    private float _decelerationRate = 1.0f;
+
+    private float _movementMultiplier = 1f;
 
     private Rigidbody rb;
 
     protected void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        _initialMaxSpeed = _maxSpeed;
     }
 
-    // Called to move the player in a direction
+    
     public void Move(Vector3 direction)
     {
         Vector3 displacementVector = direction.normalized;
 
-        // Apply acceleration and update velocity
-        displacementVector *= _acceleration * Time.deltaTime;
+        displacementVector *= _acceleration * Time.deltaTime * _movementMultiplier;
         rb.velocity += displacementVector;
 
-        // Clamp the velocity to the maximum speed
+        
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, _maxSpeed);
     }
 
@@ -43,24 +47,30 @@ public class MovementBehaviour : MonoBehaviour
         RotateToDirection(rb.velocity.normalized);
     }
 
-    // Gradually reduce the player's velocity over time
+    
     private void SlowDownOverTime()
     {
         if (rb.velocity.magnitude > 0)
         {
-            // Reduce velocity by a deceleration rate
+          
             rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, _decelerationRate * Time.deltaTime);
         }
     }
 
-    // Rotate the player towards the movement direction
-    private void RotateToDirection(Vector3 direction)
+    
+    public void RotateToDirection(Vector3 direction)
     {
         if (direction == Vector3.zero) return;
 
         Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-        // Smoothly rotate towards the target rotation
+        
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+    }
+
+    public void SetMovementMultiplier(float multiplier)
+    {
+        _movementMultiplier = multiplier;
+        _maxSpeed = _initialMaxSpeed * multiplier;
     }
 }

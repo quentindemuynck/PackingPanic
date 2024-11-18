@@ -60,9 +60,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Rotate",
+                    "name": "SpeedBoost",
                     "type": "Button",
-                    "id": "f5871707-ea59-4aad-a0be-49216432ceac",
+                    "id": "fa15e666-df62-4f2f-a4e4-b88569449b06",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "TimeSlow",
+                    "type": "Button",
+                    "id": "7935e199-3bfb-4a0a-9948-01a1db1269ef",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -193,12 +202,141 @@
                 },
                 {
                     "name": "",
-                    "id": "017cec40-08b1-4dbb-8944-f0ae878a0fc6",
+                    "id": "e639743e-1a61-43c3-b450-6fe6f3f26148",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedBoost",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bf719d3e-ffcf-4594-bec0-3d60ac36f92a",
+                    "path": "<Keyboard>/numpad1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedBoost",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3e0ecfa6-b6b1-4713-8c38-e5e5af27d1cb",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TimeSlow",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6e8df819-6ed3-4b59-b034-e6ad6d2fcb2f",
+                    "path": "<Keyboard>/numpad2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TimeSlow",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Chest",
+            "id": "f62aa51e-cc48-40fe-a380-1dfbf82a0263",
+            "actions": [
+                {
+                    "name": "Close",
+                    "type": "Button",
+                    "id": "769b2b23-b131-4f26-9f8d-7dd20b9e647a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "b56bad8a-769e-462b-8135-7a8f45c6dfae",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Rotate",
+                    "type": "Button",
+                    "id": "ee45dd75-d15e-4208-9e44-18237d5fd30c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a3d3ba4b-dabf-4d1d-9251-d02ef23a7e6f",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Close",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2644790d-9357-4b7b-b450-4fd0f4f161ac",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b7da9b70-98c9-498a-846f-8f8d3e68acf4",
                     "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Rotate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "StartScreen",
+            "id": "284afecf-5574-43ca-a891-cab4fbbee618",
+            "actions": [
+                {
+                    "name": "Back",
+                    "type": "Button",
+                    "id": "d6c9b22e-09c6-4285-adfd-c44baafd4f40",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "bae05a14-9be3-4c32-a466-3d018d0ee525",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Back",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

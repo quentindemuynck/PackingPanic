@@ -14,10 +14,11 @@ public class PlayerCharacter : BasicCharacter
     private InputAction _leftAction;
     private InputAction _rightAction;
 
+    private float _movementMultiplier = 1f;
     // Speed variable to control the movement speed of the player
 
-    p
-        ected override void Awake()
+    
+    protected override void Awake()
     {
         base.Awake();
 
@@ -71,14 +72,18 @@ public class PlayerCharacter : BasicCharacter
             movementInput += Vector3.right; // Move right
         }
 
-        // Normalize the input to prevent faster diagonal movement
         if (movementInput != Vector3.zero)
         {
             movementInput.Normalize();
         }
 
-        // Apply movement using the defined speed
+        _movementBehaviour.SetMovementMultiplier(_movementMultiplier);
         _movementBehaviour.Move(movementInput);
+    }
+
+    public void SetMultiplier(float multiplier)
+    {
+        _movementMultiplier = multiplier;
     }
 }
 

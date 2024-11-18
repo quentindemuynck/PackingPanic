@@ -4,7 +4,13 @@ using UnityEngine;
 public class OutlineOnHover : MonoBehaviour
 {
     [SerializeField]
-    private Material hoverMaterial;
+    private Material hoverMaterialInRange;
+
+    [SerializeField]
+    private Material hoverMaterialOutOfRange;
+
+    [SerializeField]
+    private float interactionRange = 3f;
 
     private Renderer currentRenderer;
     private Renderer previousRenderer;
@@ -12,18 +18,26 @@ public class OutlineOnHover : MonoBehaviour
     private InteractableObject currentInteractable;
     private InteractableObject previousInteractable;
 
+    private GameObject player;
+
     void Start()
     {
-        if (hoverMaterial == null)
+        if (hoverMaterialInRange == null || hoverMaterialOutOfRange == null)
         {
-            Debug.LogWarning("Hover material not assigned.");
+            Debug.LogWarning("Hover materials not assigned.");
             return;
+        }
+
+        player = GameObject.FindWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogError("Player not found. Ensure the player has the 'Player' tag.");
         }
     }
 
     void Update()
     {
-        if (hoverMaterial == null) return;
+        if (hoverMaterialInRange == null || hoverMaterialOutOfRange == null || player == null) return;
 
         // Cast a ray from the mouse position into the scene
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -36,14 +50,16 @@ public class OutlineOnHover : MonoBehaviour
                 currentRenderer = hit.collider.GetComponent<Renderer>();
                 currentInteractable = hit.collider.GetComponent<InteractableObject>();
 
+                // Check proximity
+                bool isInRange = Vector3.Distance(player.transform.position, hit.collider.transform.position) <= interactionRange;
 
                 ResetMaterial();
-                ApplyHoverMaterial(currentRenderer);
+                ApplyHoverMaterial(currentRenderer, isInRange);
+
                 if (currentInteractable != null)
                 {
                     currentInteractable.isHovered = true;  // Set the isHovered property
                 }
-
 
                 previousRenderer = currentRenderer;
                 previousInteractable = currentInteractable;
@@ -68,7 +84,7 @@ public class OutlineOnHover : MonoBehaviour
 
             foreach (var mat in previousRenderer.materials)
             {
-                if (!AreMaterialsEqual(mat, hoverMaterial))
+                if (!AreMaterialsEqual(mat, hoverMaterialInRange) && !AreMaterialsEqual(mat, hoverMaterialOutOfRange))
                 {
                     newMaterials.Add(mat);
                 }
@@ -83,9 +99,11 @@ public class OutlineOnHover : MonoBehaviour
         }
     }
 
-    private void ApplyHoverMaterial(Renderer renderer)
+    private void ApplyHoverMaterial(Renderer renderer, bool isInRange)
     {
-        if (!IsHoverMaterialApplied(renderer))
+        Material hoverMaterial = isInRange ? hoverMaterialInRange : hoverMaterialOutOfRange;
+
+        if (!IsHoverMaterialApplied(renderer, hoverMaterial))
         {
             List<Material> materials = new List<Material>(renderer.materials);
             materials.Add(hoverMaterial);
@@ -98,7 +116,7 @@ public class OutlineOnHover : MonoBehaviour
         return mat1.shader == mat2.shader && mat1.color == mat2.color;
     }
 
-    private bool IsHoverMaterialApplied(Renderer renderer)
+    private bool IsHoverMaterialApplied(Renderer renderer, Material hoverMaterial)
     {
         foreach (Material mat in renderer.materials)
         {

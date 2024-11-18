@@ -5,10 +5,22 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/MainScene.unity
+    path: Assets/Scenes/StartScreen.unity
+    guid: f301032ce94b53d4a9b3f405e22ffcc7
+  - enabled: 0
+    path: Assets/Scenes/PrefabMaker.unity
     guid: db26873c803574748bccb7cd6900a9ea
+  - enabled: 1
+    path: Assets/Scenes/Tutorial.unity
+    guid: 1e33af1662db4bd4c9546b23e45d3ea6
+  - enabled: 1
+    path: Assets/Scenes/LevelOne.unity
+    guid: f360afdb608112f49a59cd96c339c95e
+  - enabled: 1
+    path: Assets/Scenes/LevelTwo.unity
+    guid: 4a54bb6c2f8c29d419a11af4d1ad9952
+  - enabled: 1
+    path: Assets/Scenes/LevelThree.unity
+    guid: 2855509dce787c248babc72fdc35fa11
   m_configObjects: {}
